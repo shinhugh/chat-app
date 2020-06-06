@@ -1,6 +1,6 @@
 // Server parameters
 var port = 80;
-var path_public = "/home/haru/Documents/test/public"
+var path_public = "/home/haru/Documents/chat-app/public"
 
 // Node modules
 var express = require("express");
