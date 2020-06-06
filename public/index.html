@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <!-- Title -->
+    <title>Chat</title>
+    <!-- Icon -->
+    <link rel="icon" href="/assets/favicon.png" type="image/x-icon">
+    <!-- General style -->
+    <link type="text/css" rel="stylesheet" href="/style/main.css">
+    <!-- Page-specific style -->
+    <link type="text/css" rel="stylesheet" href="/style/index.css">
+    <!-- jQuery API -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
+    <!-- Socket.IO web API -->
+    <script src="/socket.io/socket.io.js" defer></script>
+    <!-- General client-side script for Socket.IO -->
+    <script src="/scripts/sockets.js" defer></script>
+    <!-- Page-specific script -->
+    <script src="/scripts/index.js" defer></script>
+  </head>
+
+  <body>
+
+    <noscript>
+      <div style="height: 100vh; width: 100vw; position: relative;">
+        <p class="centered">JavaScript must be enabled.</p>
+      </div>
+    </noscript>
+
+    <div id="base" hidden>
+
+      <div id="createname" class="centered">
+        <p id="createname_guide">Enter your name:</p>
+        <input id="createname_input" type="text" maxlength="20"></input>
+        <button id="createname_enter">Enter</button>
+      </div>
+
+      <div id="chat">
+        <div id="chat_log">
+
+          <!--
+          <div class="chat_log_message_in">
+            <div class="chat_log_message_meta">
+              <p class="chat_log_message_meta_user">User A</p>
+            </div>
+            <div class="chat_log_message_content_in">
+              <p class="chat_log_message_content_line">This is an incoming test message.</p>
+              <p class="chat_log_message_content_line">This is another incoming test message.</p>
+            </div>
+          </div>
+
+          <div class="chat_log_message_out">
+            <div class="chat_log_message_content_out">
+              <p class="chat_log_message_content_line">This is an outgoing test message.</p>
+              <p class="chat_log_message_content_line">This is another outgoing test message.</p>
+            </div>
+          </div>
+        -->
+
+        </div>
+        <div id="chat_input">
+          <textarea id="chat_input_text" rows="2" placeholder="Type your message.."></textarea>
+          <div id="chat_input_thumb">
+            <button id="chat_input_thumb_send">Send</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+
+</html>
