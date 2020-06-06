@@ -11,6 +11,23 @@
   transform: translate(-50%, -50%);
 }
 
+#pwgate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 55%;
+}
+
+#pwgate_input {
+  width: 40vw;
+  font-size: 160%;
+  text-align: center;
+}
+
+#pwgate_enter {
+  margin-top: 15px;
+}
+
 #createname {
   display: flex;
   flex-direction: column;
@@ -26,7 +43,6 @@
   width: 40vw;
   font-size: 160%;
   text-align: center;
-  opacity: 0;
 }
 
 #createname_enter {
@@ -62,13 +78,13 @@
 }
 
 .chat_log_message_meta {
-  margin-right: 30px;
-  width: 5vw;
+  margin-right: 20px;
+  width: 100px;
 }
 
 .chat_log_message_meta_user {
-  margin-top: 5px;
-  font-size: 35%;
+  margin-top: 1px;
+  font-size: 40%;
   word-wrap: break-word;
 }
 
@@ -85,6 +101,7 @@
 }
 
 .chat_log_message_content_line {
+  max-width: 60vw;
   padding: 5px 15px;
   margin-bottom: 10px;
   background: rgba(255, 255, 255, 1);
@@ -93,6 +110,45 @@
   border-radius: 5px;
   box-sizing: border-box;
   font-size: 50%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat_log_userupdate {
+  width: 100%;
+  padding: 10px 30px;
+  display: flex;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat_log_userupdate_text {
+  font-size: 50%;
+}
+
+#chat_shelf {
+  flex: 0 0 auto;
+  width: 100vw;
+  height: 30px;
+  padding: 2px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  box-sizing: border-box;
+  overflow-y: hidden;
+}
+
+.chat_shelf_sub {
+  display: flex;
+}
+
+.chat_shelf_sub p {
+  margin-right: 20px;
+}
+
+#chat_shelf p {
+  font-size: 60%;
 }
 
 #chat_input {

@@ -30,6 +30,11 @@
 
     <div id="base" hidden>
 
+      <div id="pwgate" class="centered">
+        <input id="pwgate_input" type="password" maxlength="20"></input>
+        <button id="pwgate_enter">Enter</button>
+      </div>
+
       <div id="createname" class="centered">
         <p id="createname_guide">Enter your name:</p>
         <input id="createname_input" type="text" maxlength="20"></input>
@@ -37,6 +42,7 @@
       </div>
 
       <div id="chat">
+
         <div id="chat_log">
 
           <!--
@@ -56,15 +62,26 @@
               <p class="chat_log_message_content_line">This is another outgoing test message.</p>
             </div>
           </div>
-        -->
+          -->
 
         </div>
+
+        <div id="chat_shelf">
+          <div class="chat_shelf_sub">
+            <p id="chat_shelf_username"></p>
+            <p id="chat_shelf_ip"></p>
+            <p id="chat_shelf_geo"></p>
+          </div>
+          <p id="chat_shelf_usercount"></p>
+        </div>
+
         <div id="chat_input">
           <textarea id="chat_input_text" rows="2" placeholder="Type your message.."></textarea>
           <div id="chat_input_thumb">
             <button id="chat_input_thumb_send">Send</button>
           </div>
         </div>
+
       </div>
 
     </div>

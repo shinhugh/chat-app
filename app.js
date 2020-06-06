@@ -1,61 +1,150 @@
 // Server parameters
-var port = 80;
-var path_public = "/home/haru/Documents/chat-app/public"
+const port = 80;
+const path_public = "/home/haru/Documents/chat-app/public"
 
 // Node modules
-var express = require("express");
-var app = express();
-var http = require("http").Server(app);
-var io = require("socket.io") (http);
+const express = require("express");
+const app = express();
+const fetch = require("node-fetch");
+const fs = require("fs");
+
+/*
+// SSL Certificate
+const credentials = {
+  key: fs.readFileSync("key.pem"),
+  cert: fs.readFileSync("cert.pem")
+};
+*/
+
+// Node modules
+const http = require("http").Server(app);
+const io = require("socket.io") (http);
+
+// Default room
+const room_name_default = "room-default";
+const room_password_default = "0000";
 
 // Number of connected clients
-var client_count = 0;
+var socket_count = 0;
+
+// Number of verified clients
+var verified_count = 0;
+
+// Verified clients' information
+var verified = new Map();
 
 // Handle connection start
 io.on("connection", function(socket) {
 
-  client_count++;
+  // Update connection count
+  socket_count++;
 
-  // Broadcast new connection notification
-  io.sockets.in("room-default").emit("userConnect", {
-    socketID: socket.id,
-    username: "User",
-    count: client_count
-  });
+  // Log
   console.log("New connection with:    "
   + socket.request.connection.remoteAddress);
-  console.log("Connection count:       " + client_count);
+  console.log("Connection count:       " + socket_count);
+  fetch("http://ip-api.com/json/" + socket.request.connection.remoteAddress)
+  .then(res => {
+    return res.json()
+  })
+  .then(obj => {
+    console.log(obj);
+  });
 
   // Handle connection end
   socket.on("disconnect", function() {
-    client_count--;
+    // Update connection count
+    socket_count--;
     // Broadcast closed connection notification
-    io.sockets.in("room-default").emit("userDisconnect", {
-      socketID: socket.id,
-      username: "User",
-      count: client_count
-    });
+    // Note: Move this if leaving room without disconnecting is possible
+    if(verified.has(socket.id)) {
+      // Update verified count
+      verified_count--;
+      // Broadcast user leave notification
+      io.sockets.in(room_name_default).emit("userLeave", {
+        socketID: socket.id,
+        username: verified.get(socket.id).username,
+        count: verified_count
+      });
+      // Revoke verification
+      verified.delete(socket.id);
+    }
+    // Log
     console.log("Closed connection with: "
     + socket.request.connection.remoteAddress);
-    console.log("Connection count:       " + client_count);
+    console.log("Connection count:       " + socket_count);
   });
 
-  // Add socket to room
-  socket.join("room-default");
+  // Handle passwordAttempt event from client
+  socket.on("passwordAttempt", function(data) {
+    if(data.password == room_password_default) {
+      // Add client to map of verified clients
+      verified.set(socket.id, {
+        username: "",
+        ip: socket.request.connection.remoteAddress,
+        geo: "Geolocation unavailable"
+      });
+      // Update verified count
+      verified_count++;
+      // Geolocation
+      fetch("http://ip-api.com/json/" + socket.request.connection.remoteAddress)
+      .then(res => {
+        return res.json()
+      })
+      .then(obj => {
+        if(obj.status == "success") {
+          verified.get(socket.id).geo = obj.city + ", " + obj.region + ", "
+          + obj.country;
+        }
+      });
+      // Notify pass
+      socket.emit("passwordConfirm", {
+        pass: true
+      });
+      // Log
+      console.log("Password match:         "
+      + socket.request.connection.remoteAddress);
+    } else {
+      // Notify fail
+      socket.emit("passwordConfirm", {
+        pass: false
+      });
+      // Log
+      console.log("Password mismatch:      "
+      + socket.request.connection.remoteAddress);
+    }
+  });
 
-  // Handle nameCreation
+  // Handle nameCreation event from client
   socket.on("nameCreation", function(data) {
-    socket.emit("enterChat", {
-      socketID: socket.id,
-      username: data.username
-    });
+    // Verify that this user has passed password check
+    if(verified.has(socket.id)) {
+      // Add socket to default room
+      socket.join(room_name_default);
+      // Add username to client's information object
+      verified.get(socket.id).username = data.username;
+      // Notify name confirmation
+      socket.emit("userAdmit", {
+        socketID: socket.id,
+        username: data.username,
+        ip: verified.get(socket.id).ip,
+        geo: verified.get(socket.id).geo
+      });
+      // Broadcast user join notification
+      io.sockets.in(room_name_default).emit("userJoin", {
+        socketID: socket.id,
+        username: data.username,
+        count: verified_count
+      });
+    }
   });
 
-  // Handle userMessageToServer
+  // Handle userMessageToServer event from client
   socket.on("userMessageToServer", function(data) {
-    io.sockets.in("room-default").emit("userMessageToClient", {
+    // Broadcast message to all members in room
+    io.sockets.in(room_name_default).emit("userMessageToClient", {
       socketID: socket.id,
-      username: data.username,
+      username: verified.get(socket.id).username,
       message: data.message
     });
   });
@@ -73,5 +162,6 @@ app.get("/", function(req, res) {
 
 // Listen for requests from clients
 http.listen(port, "0.0.0.0", function() {
+  // Log
   console.log("Listening on port " + port);
 });
