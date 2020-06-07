@@ -1,12 +1,14 @@
 // Server parameters
-const port = 80;
+const port = 80; // 443
 const path_public = "/home/haru/Documents/chat-app/public"
 
 // Node modules
 const express = require("express");
-const app = express();
 const fetch = require("node-fetch");
 const fs = require("fs");
+const http = require("http");
+// const https = require("https");
+const sio = require("socket.io");
 
 /*
 // SSL Certificate
@@ -16,9 +18,27 @@ const credentials = {
 };
 */
 
-// Node modules
-const http = require("http").Server(app);
-const io = require("socket.io") (http);
+// App and server
+const app = express();
+const server = http.createServer(app);
+// const server = https.createServer(credentials, app);
+
+// Listen for requests from clients
+server.listen(port, "0.0.0.0", function() {
+  // Log
+  console.log("Listening on port " + port);
+});
+
+// Serve static content
+app.use(express.static("public"));
+
+// Serve main page
+app.get("/", function(req, res) {
+  res.sendFile(path_public + "/index.html");
+});
+
+// Bi-directional channels with clients via sockets
+const io = sio.listen(server);
 
 // Default room
 const room_name_default = "room-default";
@@ -127,12 +147,13 @@ io.on("connection", function(socket) {
       verified.get(socket.id).in_room = true;
       // Add username to client's information object
       verified.get(socket.id).username = data.username;
-      // Notify name confirmation
+      // Notify user of room admittance
       socket.emit("userAdmit", {
         socketID: socket.id,
         username: data.username,
         ip: verified.get(socket.id).ip,
-        geo: verified.get(socket.id).geo
+        geo: verified.get(socket.id).geo,
+        encrypt_method: "None" // TODO
       });
       // Broadcast user join notification
       io.sockets.in(room_name_default).emit("userJoin", {
@@ -153,19 +174,10 @@ io.on("connection", function(socket) {
     });
   });
 
-});
+  // Handle forceReloadReq event from client
+  socket.on("forceReloadReq", function() {
+    // Force page reload for all connected clients
+    io.sockets.emit("forceReload");
+  });
 
-
-// Serve static content
-app.use(express.static("public"));
-
-// Serve main page
-app.get("/", function(req, res) {
-  res.sendFile(path_public + "/index.html");
-});
-
-// Listen for requests from clients
-http.listen(port, "0.0.0.0", function() {
-  // Log
-  console.log("Listening on port " + port);
 });

@@ -1,6 +1,6 @@
 // Script for index.html
 
-var chatVars = {
+var pageVars = {
   socketID: ""
 };
 
@@ -108,13 +108,15 @@ $(function() {
     // Clear input field
     $("createname_input").val("");
     // Store user info
-    chatVars.socketID = data.socketID;
+    pageVars.socketID = data.socketID;
     // Change display to chat
     $("#createname").fadeOut(500, function() {
       $("#chat").fadeIn(500, function() {
         $("#chat_shelf_username").html(data.username);
         $("#chat_shelf_ip").html(data.ip);
         $("#chat_shelf_geo").html(data.geo);
+        $("#chat_shelf_encryptmethod").html("Encryption: "
+        + data.encrypt_method);
         $("#chat_input_text").select();
       });
     });
@@ -134,11 +136,16 @@ $(function() {
 
   // Handle userMessageToClient event from server
   socket.on("userMessageToClient", function(data) {
-    if(data.socketID == chatVars.socketID) {
+    if(data.socketID == pageVars.socketID) {
       displayMessageOut(data.message);
     } else {
       displayMessageIn(data.username, data.message);
     }
+  });
+
+  // Handle forceReload event from server
+  socket.on("forceReload", function() {
+    window.location.reload(true);
   });
 
 });
