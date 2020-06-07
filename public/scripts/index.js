@@ -181,6 +181,7 @@ function displayMessageIn(name, message) {
   $("#chat_log").append(
     '<div class="chat_log_message_in"><div class="chat_log_message_meta"><p class="chat_log_message_meta_user">' + name + '</p></div><div class="chat_log_message_content_in"><pre class="chat_log_message_content_line">' + message + '</pre></div></div>'
   );
+  chatScrollToNew();
 }
 
 // Display new outgoing message
@@ -188,6 +189,7 @@ function displayMessageOut(message) {
   $("#chat_log").append(
     '<div class="chat_log_message_out"><div class="chat_log_message_content_out"><pre class="chat_log_message_content_line">' + message + '</pre></div></div>'
   );
+  chatScrollToNew();
 }
 
 // Display user join
@@ -195,6 +197,7 @@ function displayUserJoin(username) {
   $("#chat_log").append(
     '<div class="chat_log_userupdate"><p class="chat_log_userupdate_text">' + username + ' has joined.</p></div>'
   );
+  chatScrollToNew();
 }
 
 // Display user leave
@@ -202,4 +205,11 @@ function displayUserLeave(username) {
   $("#chat_log").append(
     '<div class="chat_log_userupdate"><p class="chat_log_userupdate_text">' + username + ' has left.</p></div>'
   );
+  chatScrollToNew();
+}
+
+// Scroll chat log to bottom
+function chatScrollToNew() {
+  $("#chat_log").animate({scrollTop: $("#chat_log").prop("scrollHeight")},
+  250);
 }

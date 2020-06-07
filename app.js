@@ -58,16 +58,18 @@ io.on("connection", function(socket) {
     // Broadcast closed connection notification
     // Note: Move this if leaving room without disconnecting is possible
     if(verified.has(socket.id)) {
-      // Update verified count
-      verified_count--;
-      // Broadcast user leave notification
-      io.sockets.in(room_name_default).emit("userLeave", {
-        socketID: socket.id,
-        username: verified.get(socket.id).username,
-        count: verified_count
-      });
+      // Broadcast user leave notification if user was in room
+      if(verified.get(socket.id).in_room) {
+        io.sockets.in(room_name_default).emit("userLeave", {
+          socketID: socket.id,
+          username: verified.get(socket.id).username,
+          count: verified_count
+        });
+      }
       // Revoke verification
       verified.delete(socket.id);
+      // Update verified count
+      verified_count--;
     }
     // Log
     console.log("Closed connection with: "
@@ -80,6 +82,7 @@ io.on("connection", function(socket) {
     if(data.password == room_password_default) {
       // Add client to map of verified clients
       verified.set(socket.id, {
+        in_room: false,
         username: "",
         ip: socket.request.connection.remoteAddress,
         geo: "Geolocation unavailable"
@@ -121,6 +124,7 @@ io.on("connection", function(socket) {
     if(verified.has(socket.id)) {
       // Add socket to default room
       socket.join(room_name_default);
+      verified.get(socket.id).in_room = true;
       // Add username to client's information object
       verified.get(socket.id).username = data.username;
       // Notify name confirmation
