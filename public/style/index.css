@@ -137,6 +137,7 @@
   align-items: flex-end;
   box-sizing: border-box;
   overflow-y: hidden;
+  overflow-x: auto;
 }
 
 .chat_shelf_sub {
